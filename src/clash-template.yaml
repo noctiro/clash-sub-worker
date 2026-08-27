@@ -27,7 +27,11 @@ proxy-providers:
 __PROVIDER_BLOCK__
 
 mode: rule
+{{if tag=no-ipv6}}
+ipv6: false
+{{else}}
 ipv6: true
+{{/if}}
 log-level: info
 {{if tag=router}}
 allow-lan: true
@@ -100,7 +104,11 @@ dns:
 {{else}}
   listen: :1053
 {{/if}}
+{{if tag=no-ipv6}}
+  ipv6: false
+{{else}}
   ipv6: true
+{{/if}}
   respect-rules: true
   cache-algorithm: arc
   enhanced-mode: fake-ip
