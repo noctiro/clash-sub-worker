@@ -1,0 +1,304 @@
+######### 锚点 start #########
+
+# 订阅更新与延迟测试公共参数
+p: &p
+  type: http
+  interval: 21600
+  health-check:
+    enable: true
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+  exclude-type: "ss|http|socks5|wireguard|trojan|vmess"
+  filter: "^(?!.*(套餐|剩余|流量|余额|过期|时间|有效|网址|邮箱|发布|客服|订阅|客户端|官网)).*$"
+
+rule-anchor:
+  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
+  domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
+  text-domain: &text-domain {type: http, interval: 86400, behavior: domain, format: text}
+  process: &process {type: http, interval: 86400, behavior: classical, format: text}
+
+all-proxies: &all-proxies {include-all: true, exclude-type: "direct|reject"}
+select-proxies: &select-proxies {type: select, lazy: true, include-all: true, exclude-type: "direct|reject"}
+round-robin-proxies: &round-robin-proxies {type: load-balance, lazy: true, strategy: round-robin, include-all: true, exclude-type: "direct|reject"}
+
+######### 锚点 end #########
+
+proxy-providers:
+__PROVIDER_BLOCK__
+
+mode: rule
+ipv6: true
+log-level: info
+{{if tag=router}}
+allow-lan: true
+{{else}}
+allow-lan: false
+{{/if}}
+bind-address: "*"
+mixed-port: 7890
+unified-delay: true
+tcp-concurrent: true
+keep-alive-interval: 30
+skip-auth-prefixes:
+  - 127.0.0.0/8
+  - ::1/128
+{{if tag=router}}
+  - 192.168.0.0/16
+{{/if}}
+
+{{if tag=router,core}}
+# UI: http://设备地址:9099/ui/
+external-controller: 0.0.0.0:9099
+# external-ui: ui
+# external-ui-name: xd
+# external-ui-url: "https://ghfast.top/https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
+secret: __CONTROLLER_SECRET__
+{{/if}}
+
+{{if tag=router}}
+find-process-mode: off
+{{else}}
+find-process-mode: strict
+{{/if}}
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  skip-domain:
+    - "Mijia Cloud"
+    - "+.push.apple.com"
+
+tun:
+  enable: true
+  stack: mixed
+  dns-hijack:
+    - "any:53"
+    - "tcp://any:53"
+  gso: true
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
+
+hosts:
+  services.googleapis.cn: services.googleapis.com
+
+dns:
+  enable: true
+{{if tag=router}}
+  listen: :53
+{{else}}
+  listen: :1053
+{{/if}}
+  ipv6: true
+  respect-rules: true
+  cache-algorithm: arc
+  enhanced-mode: fake-ip
+  fake-ip-filter-mode: rule
+  fake-ip-filter:
+    - RULE-SET,real_ip,real-ip
+    - RULE-SET,geolocation-!cn,fake-ip
+    - RULE-SET,cn_domain,real-ip
+{{if tag=giffgaff}}
+    - DOMAIN-SUFFIX,pub.3gppnetwork.org,real-ip
+{{/if}}
+    - MATCH,fake-ip
+  default-nameserver:
+    - tls://223.5.5.5#🌐 直连
+    - tls://1.12.12.12#🌐 直连
+  nameserver:
+    - quic://dns.alidns.com#🌐 直连
+    - tls://dot.pub#🌐 直连
+    - tls://one.one.one.one#🗄️ 国外DNS
+  proxy-server-nameserver:
+    - quic://dns.alidns.com#🌐 直连
+    - tls://dot.pub#🌐 直连
+  nameserver-policy:
+    "rule-set:cn_domain,private_domain":
+      - quic://dns.alidns.com#🌐 直连
+      - tls://dot.pub#🌐 直连
+    "rule-set:geolocation-!cn":
+      - "tls://dns.umbrella.com#🗄️ 国外DNS"
+      - "tls://one.one.one.one#🗄️ 国外DNS"
+      - "tls://dns.google#🗄️ 国外DNS"
+
+proxies:
+  - name: "🌐 直连"
+    type: direct
+  - name: "🚫 屏蔽"
+    type: reject
+
+proxy-groups:
+  # 路由器推荐选择负载均衡
+  - { name: 🚀 国外流量, type: select, proxies: [
+      ♻️ 自动选择, 🔰 手动选择,
+      🇺🇸 美国 (US), ⚖️ 美国-轮询 (US RR),
+      🇬🇧 英国 (UK), ⚖️ 英国-轮询 (UK RR),
+      🇨🇦 加拿大 (CA), ⚖️ 加拿大-轮询 (CA RR),
+      🇯🇵 日本 (JP), ⚖️ 日本-轮询 (JP RR),
+      🇸🇬 新加坡 (SG), ⚖️ 新加坡-轮询 (SG RR),
+      🇭🇰 香港 (HK), ⚖️ 香港-轮询 (HK RR),
+      🇩🇪 德国 (DE), ⚖️ 德国-轮询 (DE RR),
+      🇦🇺 澳大利亚 (AU), ⚖️ 澳大利亚-轮询 (AU RR),
+      ⚖️ 负载均衡-粘性, ⚖️ 负载均衡-轮询, ⚖️ 负载均衡-散列,
+      🌐 直连, 🚫 屏蔽
+    ] }
+
+  - { name: 🎯 国内流量, type: select, proxies: [🌐 直连, ♻️ 自动选择, 🔰 手动选择, ⚖️ 负载均衡-轮询, ⚖️ 负载均衡-散列, ⚖️ 负载均衡-粘性, 🚫 屏蔽] }
+  - { name: 🗄️ 国外DNS, type: select, proxies: [♻️ 自动选择, 🔰 手动选择, 🌐 直连, 🚫 屏蔽, ⚖️ 负载均衡-轮询, ⚖️ 负载均衡-散列, ⚖️ 负载均衡-粘性] }
+
+  - { name: ♻️ 自动选择, type: url-test, lazy: true, <<: *all-proxies, exclude-filter: "(?i)🇭🇰|hk\\b|香港|hong.?kong", url: https://connectivitycheck.gstatic.com/generate_204, interval: 300 }
+  - { name: 🔰 手动选择, <<: *select-proxies }
+  - { name: ⚖️ 负载均衡-轮询, type: load-balance, lazy: true, strategy: round-robin, include-all: true, exclude-type: "direct|reject", exclude-filter: "(?i)🇭🇰|hk\\b|香港|hong.?kong" }
+  - { name: ⚖️ 负载均衡-散列, type: load-balance, lazy: true, strategy: consistent-hashing, include-all: true, exclude-type: "direct|reject", exclude-filter: "(?i)🇭🇰|hk\\b|香港|hong.?kong" }
+  - { name: ⚖️ 负载均衡-粘性, type: load-balance, lazy: true, strategy: sticky-sessions, include-all: true, exclude-type: "direct|reject", exclude-filter: "(?i)🇭🇰|hk\\b|香港|hong.?kong" }
+
+  - { name: 🛑 广告拦截, type: select, proxies: [🚫 屏蔽, ♻️ 自动选择, 🔰 手动选择, 🌐 直连] }
+  - { name: 🐟 漏网之鱼, type: select, proxies: [
+      🚀 国外流量, 🎯 国内流量,
+      🇺🇸 美国 (US), ⚖️ 美国-轮询 (US RR),
+      🇬🇧 英国 (UK), ⚖️ 英国-轮询 (UK RR),
+      🇨🇦 加拿大 (CA), ⚖️ 加拿大-轮询 (CA RR),
+      🇯🇵 日本 (JP), ⚖️ 日本-轮询 (JP RR),
+      🇸🇬 新加坡 (SG), ⚖️ 新加坡-轮询 (SG RR),
+      🇭🇰 香港 (HK), ⚖️ 香港-轮询 (HK RR),
+      🇩🇪 德国 (DE), ⚖️ 德国-轮询 (DE RR),
+      🇦🇺 澳大利亚 (AU), ⚖️ 澳大利亚-轮询 (AU RR),
+      🌐 直连, 🚫 屏蔽
+    ] }
+
+  # 国家分类
+  - { name: 🇺🇸 美国 (US), <<: *select-proxies, filter: "(?i)🇺🇸|us\\b|美国|USA" }
+  - { name: ⚖️ 美国-轮询 (US RR), <<: *round-robin-proxies, filter: "(?i)🇺🇸|us\\b|美国|USA" }
+
+  - { name: 🇬🇧 英国 (UK), <<: *select-proxies, filter: "(?i)🇬🇧|uk\\b|英国|UK|Britain" }
+  - { name: ⚖️ 英国-轮询 (UK RR), <<: *round-robin-proxies, filter: "(?i)🇬🇧|uk\\b|英国|UK|Britain" }
+
+  - { name: 🇨🇦 加拿大 (CA), <<: *select-proxies, filter: "(?i)🇨🇦|ca\\b|加拿大|Canada" }
+  - { name: ⚖️ 加拿大-轮询 (CA RR), <<: *round-robin-proxies, filter: "(?i)🇨🇦|ca\\b|加拿大|Canada" }
+
+  - { name: 🇯🇵 日本 (JP), <<: *select-proxies, filter: "(?i)🇯🇵|jp\\b|日本|Japan" }
+  - { name: ⚖️ 日本-轮询 (JP RR), <<: *round-robin-proxies, filter: "(?i)🇯🇵|jp\\b|日本|Japan" }
+
+  - { name: 🇸🇬 新加坡 (SG), <<: *select-proxies, filter: "(?i)🇸🇬|sg\\b|新加坡|Singapore" }
+  - { name: ⚖️ 新加坡-轮询 (SG RR), <<: *round-robin-proxies, filter: "(?i)🇸🇬|sg\\b|新加坡|Singapore" }
+
+  - { name: 🇭🇰 香港 (HK), <<: *select-proxies, filter: "(?i)🇭🇰|hk\\b|香港|Hong Kong" }
+  - { name: ⚖️ 香港-轮询 (HK RR), <<: *round-robin-proxies, filter: "(?i)🇭🇰|hk\\b|香港|Hong Kong" }
+
+  - { name: 🇩🇪 德国 (DE), <<: *select-proxies, filter: "(?i)🇩🇪|de\\b|德国|Germany" }
+  - { name: ⚖️ 德国-轮询 (DE RR), <<: *round-robin-proxies, filter: "(?i)🇩🇪|de\\b|德国|Germany" }
+
+  - { name: 🇦🇺 澳大利亚 (AU), <<: *select-proxies, filter: "(?i)🇦🇺|au\\b|澳大利亚|Australia" }
+  - { name: ⚖️ 澳大利亚-轮询 (AU RR), <<: *round-robin-proxies, filter: "(?i)🇦🇺|au\\b|澳大利亚|Australia" }
+
+{{if tag=giffgaff}}
+  - { name: 🇬🇧 giffgaff, <<: *select-proxies, proxies: [🌐 直连], filter: "(?i)🇬🇧|uk\\b|英国|UK|Britain" }
+{{/if}}
+
+rule-providers:
+  private_domain:
+    <<: *domain
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs"
+  cn_domain:
+    <<: *domain
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/cn.mrs"
+  ad:
+    <<: *domain
+    url: "https://gcore.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomo.mrs"
+  blocklist:
+    <<: *text-domain
+    url: "https://gitlab.com/hagezi/mirror/-/raw/main/dns-blocklists/domains/pro.plus.txt"
+  games_cn:
+    <<: *domain
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-games@cn.mrs"
+  geolocation-!cn:
+    <<: *domain
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-!cn.mrs"
+  private_ip:
+    <<: *ip
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs"
+  cn_ip:
+    <<: *ip
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.mrs"
+  real_ip:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/silver716/fake-ip-filter@master/fake_ip_filter_set.yaml"
+    interval: 600
+  process-contain-cn-mainland:
+    <<: *process
+{{if tag=windows}}
+    url: "https://cdn.jsdelivr.net/gh/noctiro/process-rules@generated/mihomo/windows/contain-cn-mainland.list"
+{{elif tag=android}}
+    url: "https://cdn.jsdelivr.net/gh/noctiro/process-rules@generated/mihomo/android/contain-cn-mainland.list"
+{{elif tag=linux}}
+    url: "https://cdn.jsdelivr.net/gh/noctiro/process-rules@generated/mihomo/linux/contain-cn-mainland.list"
+{{elif tag=macos}}
+    url: "https://cdn.jsdelivr.net/gh/noctiro/process-rules@generated/mihomo/macos/contain-cn-mainland.list"
+{{else}}
+    url: "https://cdn.jsdelivr.net/gh/noctiro/process-rules@generated/mihomo/all/contain-cn-mainland.list"
+{{/if}}
+
+rules:
+  - RULE-SET,private_domain,DIRECT
+  - RULE-SET,private_ip,DIRECT,no-resolve
+
+  # 危险网站
+  - DOMAIN-SUFFIX,ping0.cc,REJECT
+
+{{if tag=giffgaff}}
+  # 地区检测
+  - DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com,🇬🇧 giffgaff
+  - DOMAIN-KEYWORD,mcc234,🇬🇧 giffgaff
+  # Vodafone
+  - DOMAIN-SUFFIX,epdg.epc.mnc015.mcc234.pub.3gppnetwork.org,🇬🇧 giffgaff
+  - DOMAIN-SUFFIX,ss.epdg.epc.mnc015.mcc234.pub.3gppnetwork.org,🇬🇧 giffgaff
+  - DOMAIN-SUFFIX,ss.epdg.epc.geo.mnc015.mcc234.pub.3gppnetwork.org,🇬🇧 giffgaff
+  - DOMAIN-SUFFIX,entsrv-uk.vodafone.com,🇬🇧 giffgaff
+  - DOMAIN-SUFFIX,vuk-gto.prod.ondemandconnectivity.com,🇬🇧 giffgaff
+  - IP-CIDR,88.82.0.0/19,🇬🇧 giffgaff,no-resolve
+  # VOXI
+  - IP-CIDR,148.252.160.0/19,🇬🇧 giffgaff,no-resolve
+  - DOMAIN,vfgb.idemia.io,🇬🇧 giffgaff
+  # CMLinkUK EE
+  - IP-CIDR,46.68.0.0/17,🇬🇧 giffgaff,no-resolve
+  # Giffgaff
+  - IP-CIDR,87.194.0.0/16,🇬🇧 giffgaff,no-resolve
+  # CTE
+  - DOMAIN-SUFFIX,ct.ee.co.uk,🇬🇧 giffgaff
+  - IP-CIDR,31.94.0.0/16,🇬🇧 giffgaff,no-resolve
+{{/if}}
+
+  # NServer-NY
+  - IP-CIDR,205.198.71.42/32,DIRECT
+  - IP-CIDR6,2602:fada:4::17:9854/64,DIRECT
+
+{{if tag=jciyuan}}
+  - DOMAIN-SUFFIX,jciyuan.com,🎯 国内流量
+{{/if}}
+{{if tag=miraimind}}
+  - PROCESS-NAME,com.immomo.miraimind,🚀 国外流量
+{{/if}}
+
+  # Google 在中国大陆的 CDN 节点
+  - DOMAIN-REGEX,^r+[0-9]+(---|\.)sn-(2x3|ni5|j5o)\w{5}\.xn--ngstr-lra8j\.com$,🎯 国内流量
+
+  - RULE-SET,ad,🛑 广告拦截
+  - RULE-SET,blocklist,🛑 广告拦截
+  - RULE-SET,process-contain-cn-mainland,🎯 国内流量
+  - RULE-SET,games_cn,🎯 国内流量
+  - RULE-SET,geolocation-!cn,🚀 国外流量
+  - RULE-SET,cn_domain,🎯 国内流量
+  - RULE-SET,cn_ip,🎯 国内流量
+  - MATCH,🐟 漏网之鱼

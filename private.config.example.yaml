@@ -1,0 +1,26 @@
+# Copy this file to private.config.yaml. Never commit that local file.
+runtime:
+  decoy-url: "https://www.noctiro.moe/"
+  upstream-timeout-ms: 15000
+  provider-cache-ttl-seconds: 1800
+
+subscription:
+  # Single title source for the browser page, filename and Profile-Title header.
+  # Non-ASCII text is automatically encoded for the HTTP header.
+  name: "Noctiro"
+  update-interval-hours: 24
+  # Keep this quoted: traffic counters can exceed JavaScript's safe integer range.
+  userinfo: "upload=0; download=715112054784; total=10994016766132224; expire=32503651200"
+  # Optional HTTPS destination shown by compatible clients.
+  # support-url: "https://t.me/your-channel"
+
+tokens:
+  - replace-with-a-long-random-token
+
+providers:
+  full-name:
+    url: "https://provider.example/subscription"
+    prefix: "[FL]"
+    direct: false
+    # Optional. Keep the upstream representation deterministic for caching.
+    user-agent: "Mihomo/1.0"

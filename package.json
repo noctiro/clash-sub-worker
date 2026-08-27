@@ -1,0 +1,32 @@
+{
+  "name": "noctiro-clash-sub-worker",
+  "version": "2.0.0",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  },
+  "scripts": {
+    "build": "npm run build:private && npm run build:public",
+    "build:private": "node scripts/build-private-config.mjs",
+    "build:public": "node scripts/build-config.mjs",
+    "cf-typegen": "wrangler types",
+    "typecheck:built": "npm run cf-typegen && tsc --noEmit",
+    "typecheck": "npm run build && npm run typecheck:built",
+    "deploy:dry:built": "wrangler deploy --dry-run --minify",
+    "deploy:dry": "npm run build && npm run deploy:dry:built",
+    "check:startup": "wrangler check startup --outfile .wrangler/worker-startup.cpuprofile",
+    "check": "npm run build && npm run typecheck:built && npm run deploy:dry:built",
+    "dev": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy --minify"
+  },
+  "devDependencies": {
+    "html-minifier-terser": "^7.2.0",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.126.0"
+  }
+}

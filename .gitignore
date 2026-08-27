@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars*
+.env*
+*.log
+*.cpuprofile
+worker-configuration.d.ts
+*-lock.json
+
+# Local private source and reproducible compiler outputs.
+private.config.yaml
+src/generated/

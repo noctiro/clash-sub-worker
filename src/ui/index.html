@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>__PROFILE_NAME__</title>
+    <style nonce="__CSP_NONCE__">
+      :root{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light dark;--bg:#0d1117;--panel:#161b22;--item:#21262d;--item-hover:#292f38;--text:#f0f3f6;--muted:#8b949e;--line:#30363d;--accent:#58a6ff;--accent-bg:#0d2d4f;--primary:#1f6feb;--primary-hover:#388bfd;--success:#3fb950;--danger:#f85149;--shadow:0 20px 60px rgba(0,0,0,.32)}
+      *{box-sizing:border-box}
+      body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);line-height:1.5}
+      main{width:min(660px,calc(100% - 32px));margin:auto;padding:clamp(42px,8vh,80px) 0}
+      header{margin:0 2px 20px}
+      h1{margin:0;font-size:clamp(1.5rem,4vw,1.9rem);line-height:1.25;letter-spacing:-.025em}
+      .intro{margin:7px 0 0;color:var(--muted);font-size:.9rem}
+      .panel{padding:24px;border:1px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:var(--shadow)}
+      .tag-group+.tag-group{margin-top:22px;padding-top:22px;border-top:1px solid var(--line)}
+      .group-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:11px}
+      h2{margin:0;font-size:.92rem}
+      .group-heading span{color:var(--muted);font-size:.75rem}
+      .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px}
+      .option{position:relative;cursor:pointer}
+      .option input{position:absolute;width:1px;height:1px;opacity:0}
+      .option span{display:flex;align-items:center;gap:9px;min-height:42px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--item);font-size:.84rem}
+      .option span::before{content:"";width:14px;height:14px;flex:none;border:1px solid var(--muted);border-radius:4px}
+      .option input[type="radio"]+span::before{border-radius:50%}
+      .option:hover span{background:var(--item-hover)}
+      .option input:checked+span{border-color:var(--accent);color:var(--text);background:var(--accent-bg)}
+      .option input[type="checkbox"]:checked+span::before{content:"✓";display:grid;place-items:center;border-color:var(--accent);background:var(--accent);color:#08111f;font-size:.68rem;font-weight:800}
+      .option input[type="radio"]:checked+span::before{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--accent-bg)}
+      .option input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+      .actions{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+      button,a{display:flex;align-items:center;justify-content:center;min-height:42px;border:1px solid var(--line);border-radius:9px;background:var(--item);color:var(--text);padding:9px 12px;font:inherit;font-size:.82rem;font-weight:600;text-align:center;text-decoration:none;cursor:pointer}
+      button:hover,a:hover{border-color:var(--muted);background:var(--item-hover)}
+      button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+      .primary{border-color:var(--primary);background:var(--primary);color:#fff}
+      .primary:hover{border-color:var(--primary-hover);background:var(--primary-hover)}
+      #status{min-height:1.2em;margin:10px 2px 0;color:var(--muted);font-size:.78rem}
+      #status[data-tone="success"]{color:var(--success)}
+      #status[data-tone="danger"]{color:var(--danger)}
+      @media(prefers-color-scheme:light){:root{--bg:#f6f8fa;--panel:#fff;--item:#f6f8fa;--item-hover:#eef1f4;--text:#1f2328;--muted:#656d76;--line:#d0d7de;--accent:#0969da;--accent-bg:#ddf4ff;--primary:#0969da;--primary-hover:#0550ae;--success:#1a7f37;--danger:#cf222e;--shadow:0 18px 50px rgba(31,35,40,.08)}}
+      @media(max-width:520px){main{width:min(100% - 20px,660px);padding:28px 0}.panel{padding:17px}.options{grid-template-columns:repeat(2,minmax(0,1fr))}.actions{grid-template-columns:1fr 1fr}.primary{grid-column:1/-1}}
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>__PROFILE_NAME__</h1>
+        <p class="intro">选择标签，然后导入或复制订阅链接。</p>
+      </header>
+      <section class="panel" aria-label="订阅设置">
+        <!--TAG_OPTIONS-->
+        <div class="actions">
+          <button id="import" class="primary" type="button">导入 Clash</button>
+          <button id="copy" type="button">复制订阅链接</button>
+          <a id="download" href="#" download>下载 YAML</a>
+        </div>
+        <p id="status" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+    <script nonce="__CSP_NONCE__">
+      (() => {
+        "use strict";
+        const params = new URLSearchParams(location.search);
+        const token = params.get("token");
+        const controls = [...document.querySelectorAll(".tag-control")];
+        const download = document.getElementById("download");
+        const status = document.getElementById("status");
+        const initialTags = new Set(
+          params.getAll("tag").flatMap((value) => value.split(",")).map((value) => value.trim()).filter(Boolean),
+        );
+
+        for (const control of controls) {
+          if (control.value && initialTags.has(control.value)) control.checked = true;
+        }
+
+        function buildUrl() {
+          const url = new URL(location.href);
+          url.search = "";
+          url.searchParams.set("token", token);
+          url.searchParams.set("format", "yaml");
+          for (const control of controls) {
+            if (control.checked && control.value) url.searchParams.append("tag", control.value);
+          }
+          return url.href;
+        }
+
+        function update() {
+          download.href = buildUrl();
+          status.textContent = "";
+          delete status.dataset.tone;
+        }
+
+        for (const control of controls) control.addEventListener("change", update);
+        document.getElementById("import").addEventListener("click", () => {
+          location.href = "clash://install-config?url=" + encodeURIComponent(buildUrl());
+        });
+        document.getElementById("copy").addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(buildUrl());
+            status.textContent = "订阅链接已复制";
+            status.dataset.tone = "success";
+          } catch {
+            status.textContent = "复制失败，请手动复制地址";
+            status.dataset.tone = "danger";
+          }
+        });
+        update();
+      })();
+    </script>
+  </body>
+</html>
