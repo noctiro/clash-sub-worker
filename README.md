@@ -108,7 +108,7 @@ https://<Worker 域名>/sub?token=<token>
 &format=yaml
 ```
 
-配置页可以选择 tag。也可以直接写在地址里：
+配置页可以选择 tag，并通过按钮直接导入、显示二维码、复制链接或下载 YAML。二维码在浏览器本地生成，不会把订阅链接发送到第三方服务。也可以直接把 tag 写在地址里：
 
 ```text
 https://<Worker 域名>/sub?token=<token>&tag=router&tag=linux
