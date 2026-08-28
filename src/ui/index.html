@@ -6,66 +6,65 @@
     <meta name="color-scheme" content="light dark">
     <title>__PROFILE_NAME__</title>
     <style nonce="__CSP_NONCE__">
-      :root{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light dark;--bg:#0d1117;--panel:#161b22;--item:#21262d;--item-hover:#292f38;--text:#f0f3f6;--muted:#8b949e;--line:#30363d;--accent:#58a6ff;--accent-bg:#0d2d4f;--primary:#1f6feb;--primary-hover:#388bfd;--success:#3fb950;--danger:#f85149;--shadow:0 20px 60px rgba(0,0,0,.32)}
+      :root{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light dark;--bg:#0d1219;--panel:#141b24;--item:#1a2430;--item-hover:#202c3a;--text:#f2f5f8;--muted:#8e9aa8;--line:#293645;--accent:#7ba2ff;--accent-bg:#182b4d;--primary:#5f8cff;--primary-hover:#76a0ff;--danger:#ff817a;--danger-bg:#321d20}
       *{box-sizing:border-box}
-      body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);line-height:1.5}
-      main{width:min(660px,calc(100% - 32px));margin:auto;padding:clamp(42px,8vh,80px) 0}
-      header{margin:0 2px 20px}
-      h1{margin:0;font-size:clamp(1.5rem,4vw,1.9rem);line-height:1.25;letter-spacing:-.025em}
-      .intro{margin:7px 0 0;color:var(--muted);font-size:.9rem}
-      .panel{padding:24px;border:1px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:var(--shadow)}
-      .tag-group+.tag-group{margin-top:22px;padding-top:22px;border-top:1px solid var(--line)}
+      body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+      button,a,.option{touch-action:manipulation}
+      main{width:min(640px,calc(100% - 32px));margin:auto;padding:clamp(32px,7vh,64px) 0}
+      .page-header{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 2px 16px}
+      h1{margin:0;overflow-wrap:anywhere;font-size:clamp(1.45rem,4vw,1.8rem);line-height:1.25;letter-spacing:-.03em}
+      .panel{padding:22px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+      .reset{flex:none;border:0;background:transparent;color:var(--accent);padding:7px 3px;font:inherit;font-size:.77rem;font-weight:650;cursor:pointer}
+      .reset:hover{text-decoration:underline;text-underline-offset:3px}
+      .reset:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:5px}
+      .reset[hidden]{display:none}
+      .tag-group+.tag-group{margin-top:20px;padding-top:19px;border-top:1px solid var(--line)}
       .group-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:11px}
-      h2{margin:0;font-size:.92rem}
-      .group-heading span{color:var(--muted);font-size:.75rem}
+      h2{margin:0;font-size:.9rem}
+      .group-heading span{color:var(--muted);font-size:.72rem}
       .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px}
       .option{position:relative;cursor:pointer}
       .option input{position:absolute;width:1px;height:1px;opacity:0}
-      .option span{display:flex;align-items:center;gap:9px;min-height:42px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--item);font-size:.84rem}
+      .option span{display:flex;align-items:center;gap:9px;min-height:42px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--item);font-size:.82rem}
       .option span::before{content:"";width:14px;height:14px;flex:none;border:1px solid var(--muted);border-radius:4px}
       .option input[type="radio"]+span::before{border-radius:50%}
       .option:hover span{background:var(--item-hover)}
-      .option input:checked+span{border-color:var(--accent);color:var(--text);background:var(--accent-bg)}
+      .option input:checked+span{border-color:var(--accent);background:var(--accent-bg)}
       .option input[type="checkbox"]:checked+span::before{content:"✓";display:grid;place-items:center;border-color:var(--accent);background:var(--accent);color:#08111f;font-size:.68rem;font-weight:800}
       .option input[type="radio"]:checked+span::before{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--accent-bg)}
       .option input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
-      .actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
-      button,a{display:flex;align-items:center;justify-content:center;min-height:42px;border:1px solid var(--line);border-radius:9px;background:var(--item);color:var(--text);padding:9px 12px;font:inherit;font-size:.82rem;font-weight:600;text-align:center;text-decoration:none;cursor:pointer}
-      button:hover,a:hover{border-color:var(--muted);background:var(--item-hover)}
-      button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-      .primary{border-color:var(--primary);background:var(--primary);color:#fff}
-      .primary:hover{border-color:var(--primary-hover);background:var(--primary-hover)}
-      .qr-panel{margin-top:16px;padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--item);text-align:center}
+      .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+      .actions>a,.actions>button{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--line);border-radius:9px;background:var(--item);color:var(--text);padding:8px 10px;font:inherit;font-size:.81rem;font-weight:650;text-align:center;text-decoration:none;cursor:pointer}
+      .actions>a:hover,.actions>button:hover{background:var(--item-hover)}
+      .actions>a:focus-visible,.actions>button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+      .actions>.primary{border-color:var(--primary);background:var(--primary);color:#fff}
+      .actions>.primary:hover{border-color:var(--primary-hover);background:var(--primary-hover)}
+      .qr-panel{margin-top:12px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--item);text-align:center}
       .qr-panel[hidden]{display:none}
-      .qr-panel h2{font-size:1rem}
-      .qr-code{display:block;max-width:100%;height:auto;margin:15px auto 12px;border-radius:10px;background:#fff;image-rendering:pixelated}
-      .qr-help{margin:0;color:var(--muted);font-size:.78rem}
-      #status{min-height:1.2em;margin:10px 2px 0;color:var(--muted);font-size:.78rem}
-      #status[data-tone="success"]{color:var(--success)}
-      #status[data-tone="danger"]{color:var(--danger)}
-      @media(prefers-color-scheme:light){:root{--bg:#f6f8fa;--panel:#fff;--item:#f6f8fa;--item-hover:#eef1f4;--text:#1f2328;--muted:#656d76;--line:#d0d7de;--accent:#0969da;--accent-bg:#ddf4ff;--primary:#0969da;--primary-hover:#0550ae;--success:#1a7f37;--danger:#cf222e;--shadow:0 18px 50px rgba(31,35,40,.08)}}
-      @media(max-width:620px){.actions{grid-template-columns:1fr 1fr}}
-      @media(max-width:520px){main{width:min(100% - 20px,660px);padding:28px 0}.panel{padding:17px}.options{grid-template-columns:repeat(2,minmax(0,1fr))}.qr-panel{padding:17px}}
+      .qr-code{display:block;max-width:100%;height:auto;margin:auto;border:8px solid #fff;border-radius:8px;background:#fff;image-rendering:pixelated}
+      #status{margin:12px 0 0;padding:8px 10px;border-radius:8px;background:var(--danger-bg);color:var(--danger);font-size:.76rem;text-align:center}
+      #status:empty{display:none}
+      .copy-buffer{position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none}
+      @media(prefers-color-scheme:light){:root{--bg:#f5f7fa;--panel:#fff;--item:#f4f6f8;--item-hover:#ebeff3;--text:#182131;--muted:#687486;--line:#dbe1e8;--accent:#356ee8;--accent-bg:#edf3ff;--primary:#316be5;--primary-hover:#255bc9;--danger:#c43d3d;--danger-bg:#fff0f0}}
+      @media(max-width:520px){main{width:min(100% - 20px,640px);padding:24px 0}.panel{padding:17px}.options{grid-template-columns:repeat(2,minmax(0,1fr))}.qr-panel{padding:13px}}
     </style>
   </head>
   <body>
     <main>
-      <header>
+      <header class="page-header">
         <h1>__PROFILE_NAME__</h1>
-        <p class="intro">选择标签，然后直接导入、扫码或复制订阅链接。</p>
+        <button id="reset" class="reset" type="button" hidden>重置</button>
       </header>
       <section class="panel" aria-label="订阅设置">
         <!--TAG_OPTIONS-->
         <div class="actions">
           <button id="import" class="primary" type="button">导入 Clash</button>
-          <button id="qr-toggle" type="button" aria-controls="qr-panel" aria-expanded="false">二维码导入</button>
-          <button id="copy" type="button">复制订阅链接</button>
+          <button id="qr-toggle" type="button" aria-controls="qr-panel" aria-expanded="false">二维码</button>
+          <button id="copy" type="button">复制链接</button>
           <a id="download" href="#" download>下载 YAML</a>
         </div>
-        <section id="qr-panel" class="qr-panel" aria-labelledby="qr-title" hidden>
-          <h2 id="qr-title">扫码导入</h2>
+        <section id="qr-panel" class="qr-panel" aria-label="订阅二维码" hidden>
           <canvas id="qr-code" class="qr-code" role="img" aria-label="当前订阅链接的二维码"></canvas>
-          <p class="qr-help">请使用支持订阅导入的 Clash / Mihomo 客户端扫描</p>
         </section>
         <p id="status" role="status" aria-live="polite"></p>
       </section>
@@ -78,34 +77,54 @@
         const token = params.get("token");
         const controls = [...document.querySelectorAll(".tag-control")];
         const download = document.getElementById("download");
+        const copy = document.getElementById("copy");
+        const reset = document.getElementById("reset");
         const qrToggle = document.getElementById("qr-toggle");
         const qrPanel = document.getElementById("qr-panel");
         const qrCanvas = document.getElementById("qr-code");
         const status = document.getElementById("status");
         let renderedQrValue = "";
+        let copyTimer;
         const initialTags = new Set(
           params.getAll("tag").flatMap((value) => value.split(",")).map((value) => value.trim()).filter(Boolean),
         );
 
+        function tagValue(control) {
+          return control.getAttribute("value") || "";
+        }
+
         for (const control of controls) {
-          if (control.value && initialTags.has(control.value)) control.checked = true;
+          const value = tagValue(control);
+          if (value && initialTags.has(value)) control.checked = true;
         }
 
         function buildUrl() {
           const url = new URL(location.href);
           url.search = "";
-          url.searchParams.set("token", token);
+          if (token) url.searchParams.set("token", token);
           url.searchParams.set("format", "yaml");
           for (const control of controls) {
-            if (control.checked && control.value) url.searchParams.append("tag", control.value);
+            const value = tagValue(control);
+            if (control.checked && value) url.searchParams.append("tag", value);
           }
           return url.href;
         }
 
-        function setStatus(message, tone) {
+        function selectedValues() {
+          return controls.filter((control) => control.checked).map(tagValue).filter(Boolean);
+        }
+
+        function syncAddress(values) {
+          const url = new URL(location.href);
+          url.search = "";
+          if (token) url.searchParams.set("token", token);
+          url.searchParams.set("format", "html");
+          for (const value of values) url.searchParams.append("tag", value);
+          history.replaceState(null, "", url);
+        }
+
+        function setStatus(message) {
           status.textContent = message;
-          if (tone) status.dataset.tone = tone;
-          else delete status.dataset.tone;
         }
 
         function renderQr(value) {
@@ -113,14 +132,19 @@
           const code = generateQr(value, { minCorrectionLevel: 1 });
           code.toCanvas(qrCanvas);
           const pixelSize = code.size + 8;
-          const scale = Math.max(1, Math.floor(320 / pixelSize));
+          const scale = Math.max(1, Math.floor(250 / pixelSize));
           qrCanvas.style.width = String(pixelSize * scale) + "px";
           renderedQrValue = value;
         }
 
-        function update() {
+        function update(sync) {
+          const values = selectedValues();
           const url = buildUrl();
           download.href = url;
+          reset.hidden = values.length === 0;
+          if (sync) syncAddress(values);
+          clearTimeout(copyTimer);
+          copy.textContent = "复制链接";
           setStatus("");
           if (!qrPanel.hidden) {
             try {
@@ -128,22 +152,49 @@
             } catch {
               qrPanel.hidden = true;
               qrToggle.setAttribute("aria-expanded", "false");
-              qrToggle.textContent = "二维码导入";
-              setStatus("二维码生成失败，请复制链接导入", "danger");
+              qrToggle.textContent = "二维码";
+              setStatus("二维码生成失败，请复制链接");
             }
           }
         }
 
-        for (const control of controls) control.addEventListener("change", update);
+        function fallbackCopy(value) {
+          const buffer = document.createElement("textarea");
+          buffer.className = "copy-buffer";
+          buffer.value = value;
+          buffer.setAttribute("readonly", "");
+          document.body.append(buffer);
+          buffer.select();
+          const copied = document.execCommand("copy");
+          buffer.remove();
+          if (!copied) throw new Error("Copy failed");
+        }
+
+        async function copyUrl(value) {
+          try {
+            if (!navigator.clipboard) throw new Error("Clipboard unavailable");
+            await navigator.clipboard.writeText(value);
+          } catch {
+            fallbackCopy(value);
+          }
+        }
+
+        for (const control of controls) control.addEventListener("change", () => update(true));
+        reset.addEventListener("click", () => {
+          for (const control of controls) control.checked = !tagValue(control);
+          update(true);
+        });
         document.getElementById("import").addEventListener("click", () => {
           location.href = "clash://install-config?url=" + encodeURIComponent(buildUrl());
         });
-        document.getElementById("copy").addEventListener("click", async () => {
+        copy.addEventListener("click", async () => {
           try {
-            await navigator.clipboard.writeText(buildUrl());
-            setStatus("订阅链接已复制", "success");
+            await copyUrl(buildUrl());
+            clearTimeout(copyTimer);
+            copy.textContent = "已复制";
+            copyTimer = setTimeout(() => { copy.textContent = "复制链接"; }, 1600);
           } catch {
-            setStatus("复制失败，请手动复制地址", "danger");
+            setStatus("复制失败，请使用下载或二维码");
           }
         });
         qrToggle.addEventListener("click", () => {
@@ -152,16 +203,19 @@
             try {
               renderQr(buildUrl());
             } catch {
-              setStatus("二维码生成失败，请复制链接导入", "danger");
+              setStatus("二维码生成失败，请复制链接");
               return;
             }
           }
           qrPanel.hidden = !show;
           qrToggle.setAttribute("aria-expanded", String(show));
-          qrToggle.textContent = show ? "收起二维码" : "二维码导入";
-          setStatus(show ? "二维码已生成" : "", show ? "success" : undefined);
+          qrToggle.textContent = show ? "收起" : "二维码";
+          setStatus("");
         });
-        update();
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && !qrPanel.hidden) qrToggle.click();
+        });
+        update(false);
       })();
     </script>
   </body>
